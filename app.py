@@ -10,7 +10,7 @@ from flask import Flask, jsonify
 
 #################################################
 # Database Setup
-engine = create_engine("sqlite:///Resources/hawaii.sqlite")
+engine = create_engine("sqlite:///Resources/hawaii.sqlite?check_same_thread=False")
 
 # reflect an existing database into a new model
 Base = automap_base()
@@ -36,12 +36,12 @@ app = Flask(__name__)
 def index():
     """List all available api routes."""
     return (
-        f"Available Routes:<br/>"
+        f"Available Routes-format for dates: 2014-05-02<br/>"
         f"/api/v1.0/precipitation<br/>"
-        f"/api/v1.0/station<br/>"
+        f"/api/v1.0/station    <br/>"
         f"/api/v1.0/tobs<br/>"
-        f"/api/v1.0/<start><br/>" 
-        f"/api/v1.0/<start>/<end><br/>"
+        f"/api/v1.0/temp/<start><br/>" 
+        f"/api/v1.0/temp/<start>/<end><br/>"
     )
 
 # 1 Convert the query results to a dictionary using `date` as the key and `prcp` as the value.
@@ -81,53 +81,16 @@ def station():
 
 # Query the dates and temperature observations of the most active station for the last year of data.
 # Return a JSON list of temperature observations (TOBS) for the previous year.
-# @app.route("/api/v1.0/tobs")
-# def tobs():
-#     # Create our session (link) from Python to the DB
-#     session = Session(engine)
+@app.route("/api/v1.0/tobs")
+def tobs():
+    # Create our session (link) from Python to the DB
+    session = Session(engine)
 
-#     """Return a list of all passenger names"""
-#     # Query all passengers
-#     results = session.query(Station.station).all()
+    """Return a list of all passenger names"""
+    # Query all passengers
+    results = session.query(Station.station).all()
 
-#     session.close()
-
-#     return jsonify(all_passengers)
-
-#Return a JSON list of temperature observations (TOBS) for the previous year.
-# Return a JSON list of the minimum temperature, the average temperature, and the max temperature for a given start or start-end range.
-# When given the start only, calculate `TMIN`, `TAVG`, and `TMAX` for all dates greater than and equal to the start date.
-# When given the start and the end date, calculate the `TMIN`, `TAVG`, and `TMAX` for dates between the start and end date inclusive.
-
-# @app.route("/api/v1.0/one-date/<date1>")
-# def date1(date1):
-#     # Create our session (link) from Python to the DB
-#     session = Session(engine)
-
-#     """Return a list of all passenger names"""
-#     # Query all passengers
-#     results = session.query(Passenger.name).all()
-
-#     session.close()
-#     @app.route("/api/v1.0/precipitation")
-#     return jsonify(date1)
-
-# def precipitation():
-#     # Create our session (link) from Python to the DB
-#     session = Session(engine)
-
-#     """Return a list of all passenger names"""
-#     # Query all passengers
-#     results = session.query(Passenger.name).all()
-
-#     session.close()
-#     return jsonify(all_passengers)  
-
-# run app application, debug to True and auto load code after changes
-if __name__ == '__main__':
-    app.run(debug=True)
-
-
+    session.close()
 #   all_stations = []
 #     for name, age, sex in results:
 #     #     passenger_dict = {}
@@ -137,3 +100,52 @@ if __name__ == '__main__':
 #     #     all_passengers.append(passenger_dict)
 #     station_list = list(np.ravel(results))  # may not need???
 #     return jsonify(all_passengers)
+    return jsonify(all_passengers)
+
+# Return a JSON list of temperature observations (TOBS) for the previous year.
+# Return a JSON list of the minimum temperature, the average temperature, and the max temperature for a given start or start-end range.
+# When given the start only, calculate `TMIN`, `TAVG`, and `TMAX` for all dates greater than and equal to the start date.
+# When given the start and the end date, calculate the `TMIN`, `TAVG`, and `TMAX` for dates between the start and end date inclusive.
+@app.route("/api/v1.0/temp/<start>")
+@app.route("/api/v1.0/temp/<start>/<end>")
+def stats(start=None, end=None):
+    """Return TMIN, TAVG, TMAX."""
+    # Select statement
+    session = Session(engine)
+    sel = [func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)]
+    if not end:
+        # calculate TMIN, TAVG, TMAX for dates greater than start
+        results = session.query(*sel).\
+            filter(Measurement.date >= start).all()
+        # Unravel results into a 1D array and convert to a list
+        temps = list(np.ravel(results))
+        return jsonify(temps)
+    # calculate TMIN, TAVG, TMAX with start and stop
+    else:
+        results = session.query(*sel).\
+        filter(Measurement.date >= start).\
+        filter(Measurement.date <= end).all()
+    # Unravel results into a 1D array and convert to a list
+        temps = list(np.ravel(results))
+        return jsonify(temps)
+
+
+# @app.route("/api/v1.0/one-date/<date1>")
+# def date1(date1):
+#     # Create our session (link) from Python to the DB
+#     session = Session(engine)
+
+#     """Return a list of all passenger names"""
+#     # Query all passengers
+#     results = session.query(Measurement.tobs).all()
+
+#     session.close()
+
+#     return jsonify(date1)
+
+
+# run app application, debug to True and auto load code after changes
+if __name__ == '__main__':
+    app.run(debug=True)
+
+
