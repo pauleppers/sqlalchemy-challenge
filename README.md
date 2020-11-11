@@ -1,4 +1,4 @@
-# SQLAlchemy Homework - Surfs Up!
+﻿# SQLAlchemy Homework - Surfs Up!
 
 ### Before You Begin
 
@@ -72,9 +72,7 @@ Now that you have completed your initial analysis, design a Flask API based on t
 
 ### Routes
 
-* `/`
-
-  * Home page.
+* `/`* Home page.
 
   * List all routes that are available.
 
@@ -156,3 +154,4 @@ Now that you have completed your initial analysis, design a Flask API based on t
 ### Copyright
 
 Trilogy Education Services © 2020. All Rights Reserved.
+

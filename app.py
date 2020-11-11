@@ -8,7 +8,6 @@ from sqlalchemy import create_engine, func
 from flask import Flask, jsonify
 import datetime as dt
 
-
 #generates the engine to the correct sqlite file
 engine = create_engine("sqlite:///Resources/hawaii.sqlite?check_same_thread=False")
 
@@ -91,7 +90,7 @@ def tobs():
     # Query all temp
     minus_year = str(dt.date(2017, 8, 23) - dt.timedelta(days=365))
     temp_query = session.query(Measurement.date, Measurement.prcp, Measurement.tobs).filter(Measurement.date >= minus_year)\
-    .filter(Measurement.tobs>=0).filter(Measurement.station== 'USC00519281').all()
+        .filter(Measurement.tobs>=0).filter(Measurement.station== 'USC00519281').all()
     # results = session.query(Measurement.date, Measurement.tobs).all()
 
     session.close()
@@ -107,8 +106,8 @@ def tobs():
 
 # 4-5 Start route
 # Return a JSON list of the minimum temperature, the average temperature, and the max temperature for a given start or start-end range.
-# When given the start only, calculate `TMIN`, `TAVG`, and `TMAX` for all dates greater than and equal to the start date.
-# When given the start and the end date, calculate the `TMIN`, `TAVG`, and `TMAX` for dates between the start and end date inclusive.
+# #4 When given the start only, calculate `TMIN`, `TAVG`, and `TMAX` for all dates greater than and equal to the start date.
+# #5 When given the start and the end date, calculate the `TMIN`, `TAVG`, and `TMAX` for dates between the start and end date inclusive.
 # 4 Route accepts the start dateas a parameter from the URL
 @app.route("/api/v1.0/temp/<start>")
 @app.route("/api/v1.0/temp2/<start>/<end>")
@@ -126,7 +125,8 @@ def stats(start=None, end=None):
         # Return a JSON list from the dataset, unravel
         temps = list(np.ravel(route))
         return jsonify(temps)
-# Returns the min, max, and average temperatures calculated from the given start date to the given end date
+    
+    # Returns the min, max, and average temperatures calculated from the given start date to the given end date
     else:
         route = session.query(*sel).filter(Measurement.date >= start).\
             filter(Measurement.date <= end).all()
