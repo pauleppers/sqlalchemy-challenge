@@ -18,7 +18,7 @@ ORM queries, Pandas, and Matplotlib.
 
 * Designed a query to retrieve the last 12 months of precipitation data.
 
-* Select only the `date` and `prcp` values.
+* Selected only the `date` and `prcp` values.
 
 * Load the query results into a Pandas DataFrame and set the index to the date column.
 
@@ -46,7 +46,7 @@ ORM queries, Pandas, and Matplotlib.
 
 ## Climate App
 
-Designed a Flask API based on the queries that you have just developed.
+Designed a Flask API based on the queries based on the above.
 
 * Flask used to create your routes.
 
